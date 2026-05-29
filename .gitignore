@@ -1,0 +1,38 @@
+# Bağımlılıklar
+/node_modules
+
+# Next.js derleme çıktıları
+/.next
+/out
+/build
+
+# Ortam değişkenleri — ANAHTAR ASLA REPOYA GİTMEZ
+.env
+.env.*
+!.env.example
+
+# Loglar
+*.log
+npm-debug.log*
+
+# Test kapsamı
+/coverage
+
+# Vercel
+.vercel
+
+# Sistem dosyaları
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea
+.vscode/*
+!.vscode/extensions.json
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Notion plan dışa aktarımı (kişisel not, repoda gerekmez)
+*36f0a789f7e881eeac3be9ce1e0c8074*
