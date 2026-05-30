@@ -2,6 +2,8 @@
 
 > Üniversite burs başvurusu (ApplyBAU / İKÜ WeAccept) için hazırlanmış, **tek sayfalık, çalışan** bir yapay zeka demosudur.
 
+### 🌐 **Canlı Demo → [sell-mind.vercel.app](https://sell-mind.vercel.app)**
+
 Kullanıcı bir Trendyol ürün linki (veya ürün açıklaması) yapıştırır, **Analiz Et**'e basar ve
 Google Gemini ile üretilen gerçek bir analiz alır: **güçlü yönler, zayıf yönler ve somut öneriler.**
 
@@ -67,13 +69,21 @@ formun başarılı/hatalı durum davranışı.
 
 ## 🌐 Canlı Demo
 
-> Yayın (Vercel) sonrası canlı link buraya eklenecek: `https://...`
->
-> Vercel'de **Environment Variables** kısmına `GEMINI_API_KEY` eklenmelidir.
+Uygulama Vercel üzerinde yayında:
 
-## 📸 Ekran Görüntüleri
+### 👉 **[https://sell-mind.vercel.app](https://sell-mind.vercel.app)**
 
-> (Buraya 1-2 ekran görüntüsü eklenecek.)
+> Not: Canlı sürümde Vercel **Environment Variables** kısmına `GEMINI_API_KEY` eklenmiştir.
+
+## 📸 Ekran Görüntüsü
+
+![SellMind ekran görüntüsü](images/image.png)
+
+## 🎬 Demo Videosu
+
+https://github.com/BurakBerksoy/SellMind/raw/main/images/20260530_121716.mp4
+
+> Video oynatılmazsa **[buraya tıklayarak izleyebilirsiniz](images/20260530_121716.mp4)**.
 
 ---
 
