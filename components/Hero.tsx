@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { APP_NAME, UI_TEXT } from "@/lib/constants";
+import { UI_TEXT } from "@/lib/constants";
 
 const container = {
   hidden: {},
@@ -32,10 +32,6 @@ export function Hero() {
 
   return (
     <motion.header variants={container} initial="hidden" animate="show" className="mb-10 text-center">
-      <motion.p variants={item} className="mb-3 text-2xl font-semibold text-brand-600">
-        {UI_TEXT.welcomeGreeting}
-      </motion.p>
-
       <motion.div variants={item}>
         <Badge className="mx-auto mb-5">
           <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
@@ -43,18 +39,26 @@ export function Hero() {
         </Badge>
       </motion.div>
 
+      {/* Değer önerisi (value proposition) başlığı */}
       <motion.h1
         variants={item}
-        className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl"
+        className="text-3xl font-bold leading-tight tracking-tight text-slate-900 sm:text-5xl"
       >
-        {APP_NAME} —{" "}
+        {UI_TEXT.heroHeadlineLead}{" "}
         <span className="bg-gradient-to-r from-brand-500 via-fuchsia-500 to-brand-700 bg-clip-text text-transparent">
-          Trendyol Ürün Analizi
+          {UI_TEXT.heroHeadlineHighlight}
         </span>
       </motion.h1>
 
-      {/* Dönen alt-başlık */}
-      <motion.div variants={item} className="mx-auto mt-4 flex h-12 max-w-xl items-center justify-center">
+      <motion.p
+        variants={item}
+        className="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-slate-600"
+      >
+        {UI_TEXT.heroSubtitle}
+      </motion.p>
+
+      {/* Dönen alt-başlık (ürünün ne yaptığını döngüyle anlatır) */}
+      <motion.div variants={item} className="mx-auto mt-3 flex h-8 max-w-xl items-center justify-center">
         <AnimatePresence mode="wait">
           <motion.p
             key={tagIndex}
@@ -62,7 +66,7 @@ export function Hero() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.4 }}
-            className="text-base leading-relaxed text-slate-600"
+            className="text-sm font-medium text-brand-600"
           >
             {taglines[tagIndex]}
           </motion.p>
