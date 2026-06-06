@@ -75,15 +75,19 @@ Uygulama Vercel üzerinde yayında:
 
 > Not: Canlı sürümde Vercel **Environment Variables** kısmına `GEMINI_API_KEY` eklenmiştir.
 
-## 📸 Ekran Görüntüsü
+## 📸 Ekran Görüntüleri
 
-![SellMind ekran görüntüsü](images/image.png)
+![SellMind ekran görüntüsü 1](images/screenshot-1.png)
+
+![SellMind ekran görüntüsü 2](images/screenshot-2.png)
+
+![SellMind ekran görüntüsü 3](images/screenshot-3.png)
 
 ## 🎬 Demo Videosu
 
-https://github.com/BurakBerksoy/SellMind/raw/main/images/20260530_121716.mp4
+https://github.com/BurakBerksoy/SellMind/raw/main/images/demo.mp4
 
-> Video oynatılmazsa **[buraya tıklayarak izleyebilirsiniz](images/20260530_121716.mp4)**.
+> Video oynatılmazsa **[buraya tıklayarak izleyebilirsiniz](images/demo.mp4)**.
 
 ---
 
