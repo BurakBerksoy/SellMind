@@ -1,8 +1,26 @@
 import "server-only";
 import { GoogleGenAI } from "@google/genai";
 import type { AnalysisResult } from "./types";
-import { GEMINI_MODEL, MAX_SUGGESTIONS } from "./constants";
+import { GEMINI_MODEL, GEMINI_FALLBACK_MODEL, MAX_SUGGESTIONS } from "./constants";
 import { parseAnalysis } from "./parseAnalysis";
+
+/** Model başına en fazla deneme sayısı. */
+const MAX_ATTEMPTS_PER_MODEL = 2;
+/** Tekrar denemeden önceki temel bekleme (üstel artar: 600ms, 1200ms…). */
+const RETRY_BASE_DELAY_MS = 600;
+/**
+ * "Geçici" (tekrar denemeye değer) HTTP durum kodları:
+ * 429 = kota/hız limiti, 503 = model anlık aşırı yoğun.
+ */
+const RETRYABLE_STATUS = new Set([429, 503]);
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** ApiError nesnesinden HTTP durum kodunu güvenle okur. */
+function statusOf(error: unknown): number | undefined {
+  const status = (error as { status?: unknown })?.status;
+  return typeof status === "number" ? status : undefined;
+}
 
 /**
  * Yapay zeka sağlayıcısı arkasındaki TEK fonksiyon (Dependency Inversion — CLAUDE.md md.8).
@@ -10,7 +28,9 @@ import { parseAnalysis } from "./parseAnalysis";
  *
  * - Yalnızca sunucu tarafında çalışır ("server-only").
  * - Anahtar yoksa veya analiz başarısızsa CÖKMEZ; null döner.
- * - Katı JSON ister; başarısız ayrıştırmada bir kez daha dener.
+ * - Katı JSON ister; başarısız ayrıştırmada tekrar dener.
+ * - Ana model "yoğunluk" (503/429) verirse üstel bekleyip tekrar dener, hâlâ olmuyorsa
+ *   yedek modele (GEMINI_FALLBACK_MODEL) geçer — demo "model yoğun" diye çökmesin.
  */
 export async function analyzeProduct(productInput: string): Promise<AnalysisResult | null> {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -19,25 +39,38 @@ export async function analyzeProduct(productInput: string): Promise<AnalysisResu
   const ai = new GoogleGenAI({ apiKey });
   const prompt = buildPrompt(productInput);
 
-  // İlk deneme + bozuk JSON / geçici hata olursa bir tekrar (toplam 2 deneme).
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    try {
-      const response = await ai.models.generateContent({
-        model: GEMINI_MODEL,
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-          temperature: 0.7,
-        },
-      });
+  // Önce ana model; o yoğunsa yedek model. Her modelde birkaç deneme + üstel bekleme.
+  for (const model of [GEMINI_MODEL, GEMINI_FALLBACK_MODEL]) {
+    for (let attempt = 0; attempt < MAX_ATTEMPTS_PER_MODEL; attempt += 1) {
+      try {
+        const response = await ai.models.generateContent({
+          model,
+          contents: prompt,
+          config: {
+            responseMimeType: "application/json",
+            temperature: 0.7,
+          },
+        });
 
-      const parsed = parseAnalysis(response.text, MAX_SUGGESTIONS);
-      if (parsed) return parsed;
-    } catch {
-      // Sessizce yut; döngü bir kez daha dener, sonra null döner.
+        const parsed = parseAnalysis(response.text, MAX_SUGGESTIONS);
+        if (parsed) return parsed;
+        // Çağrı başarılı ama JSON bozuk: kısa bekleyip tekrar dene.
+        console.warn(`[gemini] ${model}: yanıt ayrıştırılamadı (deneme ${attempt + 1}).`);
+      } catch (error) {
+        const status = statusOf(error);
+        console.error(`[gemini] ${model} başarısız (deneme ${attempt + 1}, durum=${status ?? "?"}).`);
+        // Kalıcı bir hata ise (ör. 400/404) bu modelde uğraşmadan yedek modele geç.
+        if (status !== undefined && !RETRYABLE_STATUS.has(status)) break;
+      }
+
+      // Son denemeden sonra beklemeden çık (bir sonraki model/dönüşe geç).
+      if (attempt < MAX_ATTEMPTS_PER_MODEL - 1) {
+        await sleep(RETRY_BASE_DELAY_MS * (attempt + 1));
+      }
     }
   }
 
+  console.error("[gemini] Tüm modeller ve denemeler başarısız; null dönülüyor.");
   return null;
 }
 

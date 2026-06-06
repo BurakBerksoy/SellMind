@@ -6,6 +6,10 @@ import type { AnalyzeResponse, ProductPreview } from "@/lib/types";
 // Gemini SDK + harici fetch Node ortamı gerektirir.
 export const runtime = "nodejs";
 
+// Yedek-model zinciri yavaş kalırsa Vercel'in varsayılan zaman aşımına takılmamak için
+// daha geniş bir üst sınır (saniye). Normalde analiz ~2sn'de döner.
+export const maxDuration = 30;
+
 /**
  * POST /api/analyze
  * Gövde: { input: string }
